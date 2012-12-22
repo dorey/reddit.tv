@@ -9,35 +9,6 @@
 <link rel="stylesheet" href="css/layout.css" type="text/css" />
 <link rel="alternate stylesheet" href="css/theme_dark.css" type="text/css" />
 <link rel="stylesheet" href="css/theme_light.css" type="text/css" id="theme" />
-
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js" type="text/javascript"></script>
-<script src="js/jquery.escapify.js" type="text/javascript"></script>
-<script src="js/jstorage.min.js" type="text/javascript"></script>
-<script src="js/jquery.scrollTo-1.4.2-min.js" type="text/javascript"></script>
-<script src="js/jquery.lazyload.min.js" type="text/javascript"></script>
-<script src="js/jquery.mousewheel.js" type="text/javascript"></script>
-
-<script src="js/tv.youtube.js" type="text/javascript"></script>
-<script src="js/tv.vimeo.js" type="text/javascript"></script>
-<script src="js/tv.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-  if(window.location.host.match('reddit.tv')){
-    consoleLog('Loading analytics ..');
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-12131688-3']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      consoleLog('Injecting GA ..');
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  }else{
-    consoleLog('Analytics not loaded.');
-  }
-</script>
 </head>
 <body>
 <div id="gutter-1"></div>
@@ -111,5 +82,33 @@
     exit fill screen
   </div>
 </div>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js" type="text/javascript"></script>
+<script src="js/jquery.escapify.js" type="text/javascript"></script>
+<script src="js/jstorage.min.js" type="text/javascript"></script>
+<script src="js/jquery.scrollTo-1.4.2-min.js" type="text/javascript"></script>
+<script src="js/jquery.lazyload.min.js" type="text/javascript"></script>
+<script src="js/jquery.mousewheel.js" type="text/javascript"></script>
+
+<script src="js/tv.youtube.js" type="text/javascript"></script>
+<script src="js/tv.vimeo.js" type="text/javascript"></script>
+<script src="js/tv.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+  if(window.location.host.match('reddit.tv')){
+    consoleLog('Loading analytics ..');
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-12131688-3']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      consoleLog('Injecting GA ..');
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  }else{
+    consoleLog('Analytics not loaded.');
+  }
+</script>
 </body>
 </html>
