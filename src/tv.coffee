@@ -19,15 +19,18 @@ loadSettings = ->
     Globals.user_channels = channels_cookie
     for x of Globals.user_channels
       Globals.channels.push Globals.user_channels[x]
+
 loadTheme = (id) ->
   $("#theme").attr "href", "css/theme_" + id + ".css"
   $.jStorage.set "theme", id
+
 displayChannels = ->
   $channel_list = $("#channel-list")
   $list = $("<ul></ul>")
   $channel_list.html $list
   for x of Globals.channels
     displayChannel x
+
 displayChannel = (chan) ->
   title = undefined
   display_title = undefined
@@ -37,9 +40,9 @@ displayChannel = (chan) ->
   title = "/" + title[1] + "/" + title[2]
   display_title = (if Globals.channels[chan].channel.length > 8 then Globals.channels[chan].channel.replace(/[aeiou]/g, "").substr(0, 7) else Globals.channels[chan].channel)
   if isUserChan(Globals.channels[chan].channel)
-    class_str = "class=\"user-chan\""
-    remove_str = "<a id=\"remove-" + chan + "\" class=\"remove-chan\">-</a>"
-  $("#channel-list>ul").append "<li id=\"channel-" + chan + "\" title=\"" + title + "\" " + class_str + ">" + display_title + remove_str + "</li>"
+    class_str = "class='user-chan'"
+    remove_str = "<a id='remove-#{chan}' class='remove-chan'>-</a>"
+  $("#channel-list>ul").append "<li id='channel-#{chan}' title='#{title}' #{class_str}>#{display_title}#{remove_str}</li>"
   $("#channel-" + chan).bind "click",
     channel: Globals.channels[chan].channel
     feed: Globals.channels[chan].feed
@@ -57,7 +60,6 @@ loadChannel = (channel, video_id) ->
   this_chan = getChan(channel)
   $video_embed = $("#video-embed")
   $video_title = $("#video-title")
-  title = undefined
   last_req.abort()  if last_req isnt null
   #reset
   Globals.shuffled = []
@@ -75,8 +77,8 @@ loadChannel = (channel, video_id) ->
   $("#vote-button").empty()
   $("#video-source").empty()
   title = Globals.channels[this_chan].feed.split("/")
-  title = "/" + title[1] + "/" + title[2]
-  $video_title.html "Loading " + title + " ..."
+  title = "/#{title[1]}/#{title[2]}"
+  $video_title.html "Loading #{title} ..."
   $video_embed.addClass "loading"
   $video_embed.empty()
   $("#channel-list>ul>li").removeClass "chan-selected"
@@ -128,6 +130,7 @@ loadChannel = (channel, video_id) ->
         loadVideo "first"
     else
       alert "No videos loaded for " + Globals.channels[this_chan].feed.slice(0, -5)
+
 loadVideoList = (chan) ->
   this_chan = chan
   $list = $("<span></span>")
@@ -136,7 +139,7 @@ loadVideoList = (chan) ->
     unless this_video.title_unesc
       this_video.title_unesc = $.unescapifyHTML(this_video.title)
       this_video.title_quot = String(this_video.title_unesc).replace(/\"/g, "&quot;")
-    $thumbnail = $("<img id=\"video-list-thumb-" + i + "\"" + " rel=\"" + i + "\"" + " title=\"" + this_video.title_quot + "\"/>")
+    $thumbnail = $("<img id='video-list-thumb-#{i}' rel='#{i}' title='#{this_video.title_quot}' />")
     
     # make nsfw thumbnails easily findable
     $thumbnail.addClass "nsfw_thumb"  if this_video.over_18
@@ -223,7 +226,7 @@ loadVideo = (video) ->
     else
       anchor = hash.substring(1)
       parts = anchor.split("/") # #/r/videos/id
-      hash = "/" + parts[1] + "/" + parts[2] + "/" + Globals.videos[this_chan].video[selected_video].id
+      hash = "/#{parts[1]}/#{parts[2]}/#{Globals.videos[this_chan].video[selected_video].id}"
     Globals.current_anchor = "#" + hash
     window.location.hash = hash
     gaHashTrack()
@@ -234,7 +237,7 @@ loadVideo = (video) ->
     embed = prepEmbed(embed, Globals.videos[this_chan].video[selected_video].domain)
     embed = prepEmbed(embed, "size")
     redditlink = "http://reddit.com" + $.unescapifyHTML(Globals.videos[this_chan].video[selected_video].permalink)
-    $("#video-title").html "<a href=\"" + redditlink + "\" target=\"_blank\"" + " title=\"" + Globals.videos[this_chan].video[selected_video].title_quot + "\">" + Globals.videos[this_chan].video[selected_video].title_unesc + "</a>"
+    $("#video-title").html "<a href='#{redditlink}' target='_blank' title='#{Globals.videos[this_chan].video[selected_video].title_quot}'>#{Globals.videos[this_chan].video[selected_video].title_unesc}</a>"
     $video_embed.html embed
     $video_embed.removeClass "loading"
     addListeners Globals.videos[this_chan].video[selected_video].domain
@@ -243,18 +246,20 @@ loadVideo = (video) ->
     $vote_button.stop(true, true).fadeOut "slow", ->
       $vote_button.html(reddit_string).fadeTo "slow", 1
 
-    video_source_text = "Source: " + "<a href=\"" + Globals.videos[this_chan].video[selected_video].url + "\" target=\"_blank\">" + Globals.videos[this_chan].video[selected_video].domain + "</a>"
+    video_source_text = "Source: <a href='#{Globals.videos[this_chan].video[selected_video].url}' target='_blank'>#{Globals.videos[this_chan].video[selected_video].domain}</a>"
     $video_source = $("#video-source")
     $video_source.stop(true, true).fadeOut "slow", ->
       $video_source.html(video_source_text).fadeIn "slow"
 
     resizePlayer()
     fillScreen()
+
 getVideoKey = (key) ->
   if Globals.shuffle and Globals.shuffled.length is Globals.videos[Globals.cur_chan].video.length
     Globals.shuffled[key]
   else
     key
+
 loadVideoById = (video_id) ->
   this_chan = Globals.cur_chan #returns number typed
   video = findVideoById(video_id, this_chan)
@@ -267,7 +272,7 @@ loadVideoById = (video_id) ->
     last_req = Globals.cur_vid_req
     last_req.abort()  if last_req isnt null
     Globals.cur_vid_req = $.ajax(
-      url: "http://www.reddit.com/by_id/t3_" + video_id + ".json"
+      url: "http://www.reddit.com/by_id/t3_#{video_id}.json"
       dataType: "jsonp"
       jsonp: "jsonp"
       success: (data) ->
@@ -281,19 +286,16 @@ loadVideoById = (video_id) ->
 loadPromo = (type, id, desc) ->
   consoleLog "loading promo"
   Globals.cur_chan_req.abort()  if Globals.cur_chan_req
-  created = undefined
-  url = undefined
-  embed = undefined
   domain = type + ".com"
-  hash = "/promo/" + type + "/" + id + "/" + desc
+  hash = "/promo/#{type}/#{id}/#{desc}"
   Globals.current_anchor = "#" + hash
   window.location.hash = hash
   gaHashTrack()
   switch type
     when "youtube"
-      url = "http://www.youtube.com/watch?v=" + id
+      url = "http://www.youtube.com/watch?v=#{id}"
     when "vimeo"
-      url = "http://vimeo.com/" + id
+      url = "http://vimeo.com/#{id}"
     else
       consoleLog "unsupported promo type"
   created = createEmbed(url, domain)
@@ -307,13 +309,14 @@ loadPromo = (type, id, desc) ->
     $video_embed.html embed
     $video_embed.removeClass "loading"
     addListeners domain
-    video_source_text = "Source: " + "<a href=\"" + url + "\" target=\"_blank\">" + domain + "</a>"
+    video_source_text = "Source: <a href='#{url}' target='_blank'>#{domain}</a>"
     $video_source = $("#video-source")
     $video_source.stop(true, true).fadeOut "slow", ->
       $video_source.html(video_source_text).fadeIn "slow"
 
   else
     consoleLog "unable to create promo embed"
+
 isVideo = (video_domain) ->
   Globals.domains.indexOf(video_domain) isnt -1
 
@@ -346,12 +349,15 @@ filterVideoDupes = (arr) ->
   for i of obj
     out.push obj[i]
   out.reverse()
+
 findVideoById = (id, chan) ->
   for x of Globals.videos[chan].video
     return Number(x)  if Globals.videos[chan].video[x].id is id #if found return array pos
   false #not found
+
 sfwCheck = (video, chan) ->
   Globals.sfw and Globals.videos[chan].video[video].over_18
+
 showHideNsfwThumbs = (sfw, this_chan) ->
   $(".nsfw_thumb").each ->
     $(this).attr "src", getThumbnailUrl(this_chan, Number($(this).attr("rel")))
@@ -363,6 +369,7 @@ getThumbnailUrl = (chan, video_id) ->
     (if Globals.videos[chan].video[video_id].media.oembed.thumbnail_url isnt `undefined` then Globals.videos[chan].video[video_id].media.oembed.thumbnail_url else "img/noimage.png")
   else
     "img/noimage.png"
+
 chgChan = (up_down) ->
   old_chan = Globals.cur_chan
   this_chan = old_chan
@@ -382,9 +389,11 @@ chgChan = (up_down) ->
     parts = Globals.channels[this_chan].feed.split("/")
     window.location.hash = "/" + parts[1] + "/" + parts[2] + "/"
   else Globals.cur_chan = this_chan  if this_chan isnt old_chan
+
 getFeedURI = (channel) ->
   for x of Globals.channels
     return formatFeedURI(Globals.channels[x])  if Globals.channels[x].channel is channel
+
 formatFeedURI = (channel_obj) ->
   sorting = Globals.sorting.split(":")
   sortType = ""
@@ -399,22 +408,27 @@ formatFeedURI = (channel_obj) ->
     uri = channel_obj.feed + sortType + ".json?limit=100" + sortOption
   console.log uri
   uri
+
 getChanName = (feed) ->
   for x of Globals.channels
     return Globals.channels[x].channel  if Globals.channels[x].feed.indexOf(feed) isnt -1
   false
+
 getChan = (channel) ->
   for x of Globals.channels
     return x  if Globals.channels[x].channel is channel or Globals.channels[x].feed is channel
   false
+
 getUserChan = (channel) ->
   for x of Globals.channels
     return x  if Globals.user_channels[x].channel is channel or Globals.user_channels[x].feed is channel
   false
+
 isUserChan = (channel) ->
   for x of Globals.user_channels
     return true  if Globals.user_channels[x].channel is channel
   false
+
 createEmbed = (url, type) ->
   switch type
     when "youtube.com", "youtu.be"
@@ -423,6 +437,7 @@ createEmbed = (url, type) ->
       vimeo.createEmbed url
     else
       false
+
 prepEmbed = (embed, type) ->
   switch type
     when "youtube.com", "youtu.be"
@@ -435,10 +450,12 @@ prepEmbed = (embed, type) ->
       embed
     else
       embed
+
 addListeners = (type) ->
   switch type
     when "vimeo.com"
       vimeo.addListeners()
+
 fillScreen = ->
   $object = undefined
   $fill = undefined
@@ -457,6 +474,7 @@ fillScreen = ->
       $fill.attr "checked", true
       $object.addClass "fill-screen"
       $filloverlay.css "display", "block"
+
 resizePlayer = ->
   if typeof (Globals.cur_chan) is "undefined" or typeof (Globals.videos[Globals.cur_chan]) is "undefined"
     setTimeout resizePlayer, 100
@@ -496,12 +514,14 @@ resizePlayer = ->
   $("#content").width player_width + Globals.content_minwidth
   $("#video-display").width player_width + Globals.vd_minwidth
   $("#video-display").height player_height + Globals.vd_minheight
+
 togglePlay = ->
   switch Globals.videos[Globals.cur_chan].video[Globals.cur_video].domain
     when "youtube.com", "youtu.be"
       youtube.togglePlay()
     when "vimeo.com"
       vimeo.togglePlay()
+
 addChannel = (subreddit) ->
   click = undefined
   unless subreddit
@@ -520,6 +540,7 @@ addChannel = (subreddit) ->
     displayChannel x
     $("#channel-" + x).click()  if click
   false
+
 removeChan = (chan) -> #by index (integer)
   idx = getUserChan(Globals.channels[chan].channel)
   if idx
@@ -534,6 +555,7 @@ removeChan = (chan) -> #by index (integer)
       feed: ""
 
     Globals.videos[chan] = `undefined`
+
 shuffleChan = (chan) -> #by index (integer
   # 
   #       does not shuffle actual video array
@@ -582,15 +604,9 @@ checkAnchor = ->
 
 # Reddit Functions 
 redditButton = (id) ->
-  reddit_string = "<iframe src=\"http://www.reddit.com/static/button/button1.html?width=120"
-  reddit_string += "&id=" + id
-  
-  #reddit_string += '&css=' + encodeURIComponent(window.reddit_css);
-  #reddit_string += '&bgcolor=' + encodeURIComponent(window.reddit_bgcolor);
-  #reddit_string += '&bordercolor=' + encodeURIComponent(window.reddit_bordercolor);
-  reddit_string += "&newwindow=" + encodeURIComponent("1")
-  reddit_string += "\" height=\"22\" width=\"150\" scrolling='no' frameborder='0'></iframe>"
-  reddit_string
+  "
+  <iframe src='http://www.reddit.com/static/button/button1.html?width=120&id=#{id}&newwindow=#{encodeURIComponent("1")}' height='22' width='150' scrolling='no' frameborder='0'></iframe>
+  "
 
 # Utility Functions 
 
@@ -611,8 +627,7 @@ shuffleArray = (array) ->
       array[top] = tmp
   array
 isEmpty = (obj) ->
-  for prop of obj
-    return false  if obj.hasOwnProperty(prop)
+  return false for own prop of obj
   true
 stripHTML = (s) ->
   s.replace /[&<>"'\/]/g, ""
@@ -802,27 +817,22 @@ $().ready ->
           window.open $("#video-title>a").attr("href"), "_blank"
       false
 
-  $(window).resize ->
-    resizePlayer()
+  $(window).resize -> resizePlayer()
 
   # clear add sr on click
-  $("#channel-name").click ->
-    $(this).val ""
+  $("#channel-name").click -> $(this).val ""
 
   # Anchor Checker
   if "onhashchange" of window
     # perform initial check if hotlinked
     checkAnchor()
-    window.onhashchange = ->
-      checkAnchor()
+    window.onhashchange = -> checkAnchor()
   else
     setInterval checkAnchor, 100
 
 Object.size = (obj) ->
   size = 0
-  key = undefined
-  for key of obj
-    size++  if obj.hasOwnProperty(key)
+  size++ for own key of obj
   size
 
 # analytics
